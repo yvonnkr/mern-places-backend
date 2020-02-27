@@ -1,10 +1,18 @@
 const { DUMMY_PLACES } = require("../data/dummy-places");
 const HttpError = require("../models/http-error");
 
-const getPlaces = (req, res, next) => {
-  res.status(200).json(DUMMY_PLACES);
+// single place
+const getPlaceById = (req, res) => {
+  const placeId = req.params.placeId;
+  const place = DUMMY_PLACES.find(p => p.id === placeId);
+
+  if (!place) {
+    throw new HttpError("Place with given id not found", 404);
+  }
+  res.status(200).json({ place });
 };
 
+//all user places
 const getUserPlaces = (req, res, next) => {
   const userId = req.params.uid;
   const userPlaces = DUMMY_PLACES.filter(p => p.creator === userId);
@@ -18,14 +26,4 @@ const getUserPlaces = (req, res, next) => {
   res.status(200).json({ userPlaces: userPlaces });
 };
 
-const getSinglePlace = (req, res) => {
-  const placeId = req.params.placeId;
-  const place = DUMMY_PLACES.find(p => p.id === placeId);
-
-  if (!place) {
-    throw new HttpError("Place with given id not found", 404);
-  }
-  res.status(200).json({ place });
-};
-
-module.exports = { getPlaces, getUserPlaces, getSinglePlace };
+module.exports = { getUserPlaces, getPlaceById };
