@@ -14,7 +14,7 @@ const getPlaceById = (req, res, next) => {
 };
 
 //all user places
-const getUserPlaces = (req, res, next) => {
+const getPlacesByUserId = (req, res, next) => {
   const userId = req.params.uid;
   const userPlaces = DUMMY_PLACES.filter(p => p.creator === userId);
 
@@ -90,7 +90,7 @@ const deletePlaceById = (req, res, next) => {
 };
 
 module.exports = {
-  getUserPlaces,
+  getPlacesByUserId,
   getPlaceById,
   createPlace,
   updatePlaceById,
