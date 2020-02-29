@@ -3,6 +3,7 @@ const { validationResult } = require("express-validator");
 
 let { DUMMY_PLACES } = require("../data/dummy-places");
 const HttpError = require("../models/http-error");
+const { getCoordsForAddress } = require("../utils/location");
 
 // single place
 const getPlaceById = (req, res, next) => {
@@ -30,21 +31,24 @@ const getPlacesByUserId = (req, res, next) => {
 };
 
 //create new place
-const createPlace = (req, res, next) => {
+const createPlace = async (req, res, next) => {
+  //input validation
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError("Invalid inputs passed,please check your data", 422);
+    next(new HttpError("Invalid inputs passed,please check your data", 422));
     // return res.status(422).json({ errors: errors.array().map(err => err.msg) });
   }
 
-  const {
-    title,
-    description,
-    imageUrl,
-    address,
-    coordinates,
-    creator
-  } = req.body;
+  const { title, description, imageUrl, address, creator } = req.body;
+
+  let coordinates;
+
+  try {
+    //from google geocode
+    coordinates = await getCoordsForAddress(address);
+  } catch (error) {
+    return next(error);
+  }
 
   const createdPlace = {
     id: uuidV4(),
