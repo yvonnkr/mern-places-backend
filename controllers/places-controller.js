@@ -1,4 +1,6 @@
 const { v4: uuidV4 } = require("uuid");
+const { validationResult } = require("express-validator");
+
 let { DUMMY_PLACES } = require("../data/dummy-places");
 const HttpError = require("../models/http-error");
 
@@ -29,6 +31,12 @@ const getPlacesByUserId = (req, res, next) => {
 
 //create new place
 const createPlace = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new HttpError("Invalid inputs passed,please check your data", 422);
+    // return res.status(422).json({ errors: errors.array().map(err => err.msg) });
+  }
+
   const {
     title,
     description,
@@ -62,6 +70,12 @@ const updatePlaceById = (req, res, next) => {
   if (!place) {
     const error = new HttpError("Place with given id not found", 404);
     return next(error);
+  }
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new HttpError("Invalid inputs passed,please check your data", 422);
+    // return res.status(422).json({ errors: errors.array().map(err => err.msg) });
   }
 
   const { title, description, imageUrl } = req.body;
