@@ -93,8 +93,6 @@ const createPlace = async (req, res, next) => {
     return next(new HttpError("User with given id not found", 404));
   }
 
-  console.log(user);
-
   try {
     //session/transaction
     const currentSession = await mongoose.startSession();
@@ -105,9 +103,9 @@ const createPlace = async (req, res, next) => {
     await user.save({ session: currentSession });
     await currentSession.commitTransaction();
 
-    // await createdPlace.save();//before sessions/trans
-
     res.status(201).json({ place: createdPlace });
+
+    // await createdPlace.save();//code before sessions/trans
   } catch (error) {
     return next(new HttpError("Server error", 500));
   }
@@ -161,8 +159,9 @@ const updatePlaceById = async (req, res, next) => {
 //delete place
 const deletePlaceById = async (req, res, next) => {
   let place;
+
   try {
-    place = await Place.findByIdAndDelete(req.params.placeId);
+    place = await Place.findById(req.params.placeId).populate("creator");
   } catch (e) {
     return next(new HttpError("Server error", 500));
   }
@@ -171,10 +170,23 @@ const deletePlaceById = async (req, res, next) => {
     return next(new HttpError("Place with given id not found", 404));
   }
 
+  try {
+    //session/transaction
+    const currentSession = await mongoose.startSession();
+    currentSession.startTransaction();
+    await place.remove({ session: currentSession });
+    place.creator.places.pull(place);
+    await place.creator.save({ session: currentSession });
+    await currentSession.commitTransaction();
+    // await place.remove();
+  } catch (error) {
+    return next(new HttpError("Server error", 500));
+  }
+
   res.status(200).json({ message: "Place Deleted", place });
 
   //another way
-  //findById  --then place.remove()
+  // place = await Place.findByIdAndDelete(req.params.placeId);
 };
 
 module.exports = {
