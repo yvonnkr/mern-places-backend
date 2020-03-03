@@ -1,6 +1,8 @@
 const express = require("express");
-const { json, urlencoded } = require("body-parser");
+const mongoose = require("mongoose");
+const { json } = require("body-parser");
 
+// require("./db/db-connect");
 const usersRoutes = require("./routes/users-routes");
 const placesRoutes = require("./routes/places-routes");
 const HttpError = require("./models/http-error");
@@ -37,6 +39,24 @@ app.use((error, req, res, next) => {
     .json({ message: error.message || "An Unknown error occurred!" });
 });
 
-app.listen(5000, () => {
-  console.log("Server up on port 5000");
-});
+// app.listen(5000, () => {
+//   console.log("Server up on port 5000");
+// });
+
+mongoose
+  .connect(process.env.MONGODB_URL, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true
+  })
+  .then(() => {
+    console.log("Connected to database");
+
+    app.listen(5000, () => {
+      console.log("Server up on port 5000");
+    });
+  })
+  .catch(() => {
+    console.log("Connection to Database failed");
+  });

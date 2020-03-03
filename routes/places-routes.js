@@ -45,11 +45,7 @@ router.patch(
     check("description")
       .trim()
       .isLength({ min: 5 })
-      .withMessage("Description is required mim length 5"),
-    check("imageUrl")
-      .trim()
-      .isURL()
-      .withMessage("Image url is invalid")
+      .withMessage("Description is required mim length 5")
   ],
   placesController.updatePlaceById
 );
