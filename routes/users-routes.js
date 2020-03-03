@@ -19,8 +19,8 @@ router.post(
       .isEmail()
       .withMessage("please enter a valid email"),
     check("password")
-      .isLength({ min: 5 })
-      .withMessage("password must be at least 5 chars long")
+      .isLength({ min: 6 })
+      .withMessage("password must be at least 6 chars long")
   ],
   userControllers.signup
 );
