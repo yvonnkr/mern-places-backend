@@ -28,12 +28,12 @@ const getPlaceById = async (req, res, next) => {
 
 //all user places
 const getPlacesByUserId = async (req, res, next) => {
+  //see ALTERNATIVE SYNTAX/WAY below using populate **********************************
   const userId = req.params.uid;
-
   let userPlaces;
 
   try {
-    userPlaces = await Place.find({ creator: userId });
+    userPlaces = await Place.find({ creator: userId }).populate("creator");
   } catch (error) {
     return next(new HttpError("Server eror", 500));
   }
@@ -47,7 +47,26 @@ const getPlacesByUserId = async (req, res, next) => {
   res
     .status(200)
     .json({ userPlaces: userPlaces.map(p => p.toObject({ getters: true })) });
-  // p.toObject({getters:true}) --turns mongoose place object to normal object and adds prop id
+
+  //**ALTERNATIVE WAY USING POPULATE */
+  // const userId = req.params.uid;
+  // let userWithPlaces;
+
+  // try {
+  //   userWithPlaces = await User.findById(userId).populate("places");
+  // } catch (error) {
+  //   return next(new HttpError("Server eror", 500));
+  // }
+
+  // if (!userWithPlaces || userWithPlaces.places.length === 0) {
+  //   return next(
+  //     new HttpError("Could not find any place for provided user", 404)
+  //   );
+  // }
+
+  // res.status(200).json({
+  //   userPlaces: userWithPlaces.places.map(p => p.toObject({ getters: true }))
+  // });
 };
 
 //create new place
