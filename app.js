@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
@@ -10,6 +13,9 @@ const HttpError = require("./models/http-error");
 const app = express();
 
 app.use(bodyParser.json());
+
+//serve images statically
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 //Solve CORS error  --Cross-Origin-Resource-Sharing --blocks sharing data/resources from different domains
 app.use((req, res, next) => {
@@ -31,8 +37,15 @@ app.use((req, res, next) => {
   throw error;
 });
 
-//Error Handling middleware
+//All other Error Handling middleware
 app.use((error, req, res, next) => {
+  //rollback/remove image upload if any error found
+  if (req.file) {
+    fs.unlink(req.file.path, err => {
+      console.log(err);
+    });
+  }
+
   if (res.headerSent) {
     return next(error);
   }
@@ -41,10 +54,6 @@ app.use((error, req, res, next) => {
     .status(error.code || 500)
     .json({ message: error.message || "An Unknown error occurred!" });
 });
-
-// app.listen(5000, () => {
-//   console.log("Server up on port 5000");
-// });
 
 mongoose
   .connect(process.env.MONGODB_URL, {

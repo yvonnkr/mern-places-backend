@@ -44,7 +44,7 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image: "https://live.staticflickr.com/7631/26849088292_36fc52ee90_b.jpg",
+    image: req.file.path, //then prepend "http://localhost:5000/" in frontend
     password,
     places: []
   });
