@@ -24,6 +24,7 @@ const signup = async (req, res, next) => {
     return next(
       new HttpError("Invalid inputs passed,please check your data", 422)
     );
+    // return res.status(422).json({ errors: errors.array().map(err => err.msg) });
   }
 
   const { name, email, password } = req.body;
@@ -72,7 +73,10 @@ const login = async (req, res, next) => {
     return next(new HttpError("Incorrect credetial,unable to login", 401));
   }
 
-  res.status(200).json({ message: "Logged in" });
+  res.status(200).json({
+    message: "Logged in",
+    user: existingUser.toObject({ getters: true }) //exposes the password....
+  });
 
   // const userIndex = DUMMY_USERS.findIndex(u => u.email === email);
 

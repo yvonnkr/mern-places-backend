@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { json } = require("body-parser");
+const bodyParser = require("body-parser");
 
 // require("./db/db-connect");
 const usersRoutes = require("./routes/users-routes");
@@ -9,13 +9,16 @@ const HttpError = require("./models/http-error");
 
 const app = express();
 
-app.use(json());
+app.use(bodyParser.json());
 
 //Solve CORS error  --Cross-Origin-Resource-Sharing --blocks sharing data/resources from different domains
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
 
