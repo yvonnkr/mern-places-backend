@@ -1,5 +1,7 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
 
@@ -64,7 +66,22 @@ const signup = async (req, res, next) => {
     return next(new HttpError("Server Error", 500));
   }
 
-  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+  //generate JWT
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: createdUser.id, email: createdUser.email },
+      process.env.JWT_PRIVATE_KEY,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    return next(new HttpError("Signup failed,try again later", 500));
+  }
+
+  res
+    .status(201)
+    .json({ userId: createdUser.id, email: createdUser.email, token: token });
+  // res.status(201).json({ user: createdUser.toObject({ getters: true }) }); //before token
 };
 
 //login user
@@ -99,10 +116,28 @@ const login = async (req, res, next) => {
     return next(new HttpError("Incorrect credetial,unable to login", 401));
   }
 
+  //generate JWT if isValidPassword
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: existingUser.id, email: existingUser.email },
+      process.env.JWT_PRIVATE_KEY,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    return next(new HttpError("Loggin in failed,try again later", 500));
+  }
+
   res.status(200).json({
-    message: "Logged in",
-    user: existingUser.toObject({ getters: true })
+    userId: existingUser.id,
+    email: existingUser.email,
+    token: token
   });
+
+  // res.status(200).json({
+  //   message: "Logged in",
+  //   user: existingUser.toObject({ getters: true })
+  // });
 };
 
 module.exports = { getUsers, signup, login };
