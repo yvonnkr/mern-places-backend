@@ -80,7 +80,7 @@ const createPlace = async (req, res, next) => {
     // return res.status(422).json({ errors: errors.array().map(err => err.msg) });
   }
 
-  const { title, description, imageUrl, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
 
   let coordinates;
 
@@ -94,7 +94,7 @@ const createPlace = async (req, res, next) => {
   const createdPlace = new Place({
     title,
     description,
-    imageUrl,
+    imageUrl: req.file.path,
     address,
     location: coordinates,
     creator

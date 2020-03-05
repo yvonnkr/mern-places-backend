@@ -1,6 +1,7 @@
 const express = require("express");
 const { check } = require("express-validator");
 const placesController = require("../controllers/places-controller");
+const fileUpload = require("../middleware/file-upload");
 
 const router = express.Router();
 
@@ -13,8 +14,9 @@ router.get("/user/:uid", placesController.getPlacesByUserId);
 //create new place
 router.post(
   "/",
+  fileUpload.single("imageUrl"),
   [
-    check("title")
+    (check("title")
       .trim()
       .notEmpty()
       .withMessage("Title is required"),
@@ -29,7 +31,7 @@ router.post(
     check("address")
       .trim()
       .notEmpty()
-      .withMessage("Address is required")
+      .withMessage("Address is required"))
   ],
   placesController.createPlace
 );
