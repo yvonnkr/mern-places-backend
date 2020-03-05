@@ -1,4 +1,5 @@
 const { validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
 
@@ -41,11 +42,19 @@ const signup = async (req, res, next) => {
     return next(new HttpError("User with given email already exists", 422));
   }
 
+  //Hash password
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    return next(new HttpError("Could not create user, please try again", 500));
+  }
+
   const createdUser = new User({
     name,
     email,
     image: req.file.path, //then prepend "http://localhost:5000/" in frontend
-    password,
+    password: hashedPassword,
     places: []
   });
 
@@ -75,14 +84,8 @@ const login = async (req, res, next) => {
 
   res.status(200).json({
     message: "Logged in",
-    user: existingUser.toObject({ getters: true }) //exposes the password....
+    user: existingUser.toObject({ getters: true })
   });
-
-  // const userIndex = DUMMY_USERS.findIndex(u => u.email === email);
-
-  // DUMMY_USERS[userIndex].isLoggedIn = true;
-
-  // res.status(200).json({ message: "Logged in" });
 };
 
 module.exports = { getUsers, signup, login };
