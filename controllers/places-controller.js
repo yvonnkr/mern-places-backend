@@ -157,6 +157,12 @@ const updatePlaceById = async (req, res, next) => {
     return next(new HttpError("Place with the given id not found", 404));
   }
 
+  if (place.creator.toString() !== req.userData.userId) {
+    return next(
+      new HttpError("You are not authorised to edit this place.", 401)
+    );
+  }
+
   place.title = title;
   place.description = description;
 
@@ -191,6 +197,12 @@ const deletePlaceById = async (req, res, next) => {
     return next(new HttpError("Place with given id not found", 404));
   }
 
+  if (place.creator.id !== req.userData.userId) {
+    return next(
+      new HttpError("You are not authorised to delete this place.", 401)
+    );
+  }
+
   const imagePath = place.imageUrl;
 
   try {
@@ -212,9 +224,6 @@ const deletePlaceById = async (req, res, next) => {
   });
 
   res.status(200).json({ message: "Place Deleted", place });
-
-  //another way
-  // place = await Place.findByIdAndDelete(req.params.placeId);
 };
 
 module.exports = {

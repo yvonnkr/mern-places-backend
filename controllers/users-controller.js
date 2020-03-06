@@ -96,7 +96,7 @@ const login = async (req, res, next) => {
   }
 
   if (!existingUser) {
-    return next(new HttpError("Incorrect credetial,unable to login", 401));
+    return next(new HttpError("Incorrect credetial,unable to login", 403));
   }
 
   //compare hashed pswd & re.body pswd
@@ -113,7 +113,7 @@ const login = async (req, res, next) => {
   }
 
   if (!isValidPassword) {
-    return next(new HttpError("Incorrect credetial,unable to login", 401));
+    return next(new HttpError("Incorrect credetial,unable to login", 403));
   }
 
   //generate JWT if isValidPassword
@@ -125,7 +125,7 @@ const login = async (req, res, next) => {
       { expiresIn: "1h" }
     );
   } catch (err) {
-    return next(new HttpError("Loggin in failed,try again later", 500));
+    return next(new HttpError("Loggin in failed,try again later", 403));
   }
 
   res.status(200).json({
