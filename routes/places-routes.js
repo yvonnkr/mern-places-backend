@@ -2,6 +2,7 @@ const express = require("express");
 const { check } = require("express-validator");
 const placesController = require("../controllers/places-controller");
 const fileUpload = require("../middleware/file-upload");
+const checkAuth = require("../middleware/check-auth");
 
 const router = express.Router();
 
@@ -10,6 +11,9 @@ router.get("/:placeId", placesController.getPlaceById);
 
 //all user places
 router.get("/user/:uid", placesController.getPlacesByUserId);
+
+//all routes after this check here are protected --authentication
+router.use(checkAuth);
 
 //create new place
 router.post(
