@@ -107,7 +107,7 @@ const createPlace = async (req, res, next) => {
   try {
     user = await User.findById(creator);
   } catch (error) {
-    return next(new HttpError("Server Error", 500));
+    return next(new HttpError("Server Error, user not found", 500));
   }
 
   if (!user) {
@@ -128,7 +128,7 @@ const createPlace = async (req, res, next) => {
 
     // await createdPlace.save();//code before sessions/trans
   } catch (error) {
-    return next(new HttpError("Server error", 500));
+    return next(new HttpError("Server error, could not create place", 500));
   }
 };
 
