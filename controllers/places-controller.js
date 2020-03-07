@@ -79,10 +79,9 @@ const createPlace = async (req, res, next) => {
     return next(
       new HttpError("Invalid inputs passed,please check your data", 422)
     );
-    // return res.status(422).json({ errors: errors.array().map(err => err.msg) });
   }
 
-  const { title, description, address, creator } = req.body;
+  const { title, description, address } = req.body;
 
   let coordinates;
 
@@ -99,13 +98,13 @@ const createPlace = async (req, res, next) => {
     imageUrl: req.file.path,
     address,
     location: coordinates,
-    creator
+    creator: req.userData.userId
   });
 
   let user;
 
   try {
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId);
   } catch (error) {
     return next(new HttpError("Server Error, user not found", 500));
   }
