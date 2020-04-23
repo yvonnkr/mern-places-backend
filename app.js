@@ -41,7 +41,7 @@ app.use((req, res, next) => {
 app.use((error, req, res, next) => {
   //rollback/remove image upload if any error found
   if (req.file) {
-    fs.unlink(req.file.path, err => {
+    fs.unlink(req.file.path, (err) => {
       console.log(err);
     });
   }
@@ -57,12 +57,13 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@placescluster-m7757.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
+    // `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@placescluster-m7757.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
+    process.env.MONGODB_URL,
     {
       useNewUrlParser: true,
       useCreateIndex: true,
       useFindAndModify: false,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     }
   )
   .then(() => {
